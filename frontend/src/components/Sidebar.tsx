@@ -28,14 +28,25 @@ export function Sidebar({ mode, onChange }: SidebarProps) {
       {/* Logo block */}
       <div className="px-4 py-4 border-b border-edge-subtle">
         <div className="flex items-center gap-2.5">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-bold shadow-glow-sm"
-            style={{
-              backgroundImage: `linear-gradient(135deg, rgb(var(--c-primary-500)), rgb(var(--c-accent-500)))`,
-            }}
+          <svg
+            viewBox="0 0 32 32"
+            className="w-9 h-9 rounded-lg shadow-glow-sm shrink-0"
+            aria-hidden
           >
-            BI
-          </div>
+            <defs>
+              <linearGradient id="sidebarLogoGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="rgb(var(--c-primary-500))" />
+                <stop offset="100%" stopColor="rgb(var(--c-accent-500))" />
+              </linearGradient>
+            </defs>
+            <rect width="32" height="32" rx="7" fill="url(#sidebarLogoGrad)" />
+            <g fill="white">
+              <rect x="7.5" y="20" width="4.5" height="6.5" rx="1.3" />
+              <rect x="13.75" y="16" width="4.5" height="10.5" rx="1.3" />
+              <rect x="20" y="11" width="4.5" height="15.5" rx="1.3" />
+              <path d="M 22.25,4 C 22.25,5.8 23.4,7.2 26,7.9 C 23.4,8.6 22.25,10 22.25,11.8 C 22.25,10 21.1,8.6 18.5,7.9 C 21.1,7.2 22.25,5.8 22.25,4 Z" />
+            </g>
+          </svg>
           <div>
             <div className="font-semibold text-ink-primary leading-tight">
               {health?.app ?? 'Smart BI'}

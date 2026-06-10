@@ -61,6 +61,21 @@ def main() -> int:
         except KeyboardInterrupt:
             return 0
 
+    # 2.5  Workaround for pywebview 6.x on macOS Tahoe (and some Sequoia
+    # builds): the Cocoa backend forgets to set NSApp's activation policy to
+    # .regular, so the process runs as a background daemon — no Dock icon,
+    # no window. We force-set the policy and tell NSApp to take focus
+    # before webview.start() spins up the run loop.
+    if sys.platform == "darwin":
+        try:
+            from AppKit import NSApp, NSApplication  # type: ignore
+            NSApplication.sharedApplication()
+            NSApp.setActivationPolicy_(0)  # NSApplicationActivationPolicyRegular
+            NSApp.activateIgnoringOtherApps_(True)
+            log.info("Forced NSApp activation policy = regular (Tahoe workaround)")
+        except Exception as e:
+            log.warning(f"Could not patch NSApp activation policy: {e}")
+
     # 3. Pick window dimensions
     try:
         win_w, win_h = 1280, 800

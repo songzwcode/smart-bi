@@ -87,8 +87,13 @@ export function SettingsView() {
         api_key: provider !== 'ollama' ? apiKey : undefined,
       });
       setLlmInfo(r);
-      setMsg('✓ 已切换并保存到配置（重启后保留）');
+      // Sync the form state with the just-switched provider so the dropdown
+      // and other inputs reflect the active selection instead of sticking to
+      // the default 'ollama'.
+      setProvider(r.current_provider || provider);
+      if (r.current_model) setModel(r.current_model);
       setApiKey('');
+      setMsg(`✓ 已切换到 ${r.current_provider}${r.current_model ? ' · ' + r.current_model : ''}`);
       setPersistedTick((n) => n + 1);
     } catch (e) {
       setMsg(`✗ ${e instanceof Error ? e.message : String(e)}`);

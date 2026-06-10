@@ -9,6 +9,7 @@ interface Props {
 
 export function ConnectionDialog({ onClose }: Props) {
   const setSchema = useStore((s) => s.setSchema);
+  const setHealth = useStore((s) => s.setHealth);
   const [dbType, setDbType] = useState<ConnectionConfigFE['db_type']>('sqlite');
   const [filePath, setFilePath] = useState('examples/sample.db');
   const [host, setHost] = useState('127.0.0.1');
@@ -40,8 +41,9 @@ export function ConnectionDialog({ onClose }: Props) {
       const cfg = collect();
       const r = await api.connect(cfg, true);
       if (r.ok) {
-        const s = await api.getSchema(true);
+        const [s, h] = await Promise.all([api.getSchema(true), api.health()]);
         setSchema(s);
+        setHealth(h);
         onClose();
       } else {
         setMsg(`✗ failed`);
