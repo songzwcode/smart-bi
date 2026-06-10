@@ -88,6 +88,10 @@ a = Analysis(
         "tests",
         "sphinx",
         "PIL.ImageQt",
+        # ChromaDB pulls posthog for telemetry but it's not used and not
+        # bundled — the missing module throws a noisy warning at startup.
+        "chromadb.telemetry.product.posthog",
+        "posthog",
     ],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
