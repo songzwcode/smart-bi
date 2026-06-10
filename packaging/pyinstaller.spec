@@ -4,8 +4,8 @@
 #   pyinstaller packaging/pyinstaller.spec
 #
 # Output:
-#   dist/SmartBI      (single file, recommended for distribution)
-#   dist/SmartBI.app  (macOS bundle, when --windowed is set)
+#   macOS:   dist/SmartBI.app      (onedir bundle with Frameworks/ + Resources/)
+#   Windows: dist/SmartBI.exe      (single-file executable)
 
 import sys
 from pathlib import Path
@@ -97,35 +97,65 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    [],
-    name="SmartBI",
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=False,                # disabled by default; enable after testing
-    upx_exclude=[],
-    runtime_tmpdir=None,
-    console=False,            # GUI app, no console window
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-    icon=str(PROJECT_ROOT / "packaging" / "icons" / "icon.icns") if (PROJECT_ROOT / "packaging" / "icons" / "icon.icns").exists() else None,
-)
+ICON_ICNS = str(PROJECT_ROOT / "packaging" / "icons" / "icon.icns") if (PROJECT_ROOT / "packaging" / "icons" / "icon.icns").exists() else None
 
-# macOS: build a .app bundle
+# Windows: one-file EXE. Single .exe the user can run / distribute.
+if sys.platform == "win32":
+    exe = EXE(
+        pyz,
+        a.scripts,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        [],
+        name="SmartBI",
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=False,                # disabled by default; enable after testing
+        upx_exclude=[],
+        runtime_tmpdir=None,
+        console=False,            # GUI app, no console window
+        disable_windowed_traceback=False,
+        argv_emulation=False,
+        target_arch=None,
+        codesign_identity=None,
+        entitlements_file=None,
+        icon=str(PROJECT_ROOT / "packaging" / "icons" / "icon.ico") if (PROJECT_ROOT / "packaging" / "icons" / "icon.ico").exists() else None,
+    )
+
+# macOS: onedir (.app with Frameworks/ + Resources/ folders). PyInstaller's
+# recommended pattern for macOS — onefile mode conflicts with macOS code
+# signing and will become an error in PyInstaller 7.
 if sys.platform == "darwin":
-    app = BUNDLE(
+    exe = EXE(
+        pyz,
+        a.scripts,
+        [],                      # binaries go to COLLECT (onedir)
+        exclude_binaries=True,
+        name="SmartBI",
+        debug=False,
+        bootloader_ignore_signals=False,
+        strip=False,
+        upx=False,
+        console=False,            # GUI app, no console window
+        disable_windowed_traceback=False,
+        icon=ICON_ICNS,
+    )
+    coll = COLLECT(
         exe,
+        a.binaries,
+        a.zipfiles,
+        a.datas,
+        strip=False,
+        upx=False,
+        upx_exclude=[],
+        name="SmartBI",
+    )
+    app = BUNDLE(
+        coll,
         name="SmartBI.app",
-        icon=str(PROJECT_ROOT / "packaging" / "icons" / "icon.icns") if (PROJECT_ROOT / "packaging" / "icons" / "icon.icns").exists() else None,
+        icon=ICON_ICNS,
         bundle_identifier="com.smartbi.app",
         info_plist={
             "CFBundleName": "Smart BI",

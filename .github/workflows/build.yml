@@ -1,0 +1,123 @@
+name: build
+
+on:
+  # Build on every push to main so artifacts are always available
+  push:
+    branches: [main]
+    tags: ['v*']
+  # Allow manual runs from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            artifact_name: SmartBI-macOS
+            path: dist/SmartBI.app
+            archive: SmartBI.app.zip
+            spec_flags: ''
+          - os: windows-latest
+            artifact_name: SmartBI-Windows
+            path: dist/SmartBI.exe
+            archive: SmartBI.exe
+            # On Windows, --noconsole hides the console window
+            spec_flags: ''
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pip install pyinstaller
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci || npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Verify frontend artefacts
+        shell: bash
+        run: |
+          if [ ! -f backend/static/index.html ]; then
+            echo "ERROR: backend/static/index.html missing — frontend build failed?"
+            exit 1
+          fi
+
+      - name: Run PyInstaller (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          rm -rf dist build
+          pyinstaller packaging/pyinstaller.spec --noconfirm ${{ matrix.spec_flags }}
+          # Zip the .app bundle (GitHub Actions can't upload directories containing app bundles directly)
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent SmartBI.app SmartBI.app.zip
+
+      - name: Run PyInstaller (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          if (Test-Path dist) { Remove-Item -Recurse -Force dist }
+          if (Test-Path build) { Remove-Item -Recurse -Force build }
+          pyinstaller packaging/pyinstaller.spec --noconfirm ${{ matrix.spec_flags }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.archive }}
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    # Attach binaries to a GitHub Release when a v* tag is pushed.
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten & show
+        run: |
+          ls -la artifacts/
+          # Each matrix job produced a folder named SmartBI-{macOS,Windows};
+          # move the zip/exe up one level so they sit next to the README.
+          find artifacts -mindepth 2 -maxdepth 2 -type f -exec mv {} artifacts/ \;
+          ls -la artifacts/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/SmartBI.app.zip
+            artifacts/SmartBI.exe
+          generate_release_notes: true
+          fail_on_unmatched_files: true
