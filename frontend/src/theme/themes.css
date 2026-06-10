@@ -1,0 +1,106 @@
+/* Theme variables — three presets.
+ * All colors are stored as R G B triplets (no commas) so Tailwind's
+ * `rgb(var(--c-x) / <alpha-value>)` syntax works.
+ * Switching themes = flipping the `data-theme` attribute on <html>.
+ */
+
+:root,
+:root[data-theme='light'] {
+  /* Brand: indigo/violet */
+  --c-primary-50:  238 242 255;
+  --c-primary-100: 224 231 255;
+  --c-primary-200: 199 210 254;
+  --c-primary-300: 165 180 252;
+  --c-primary-400: 129 140 248;
+  --c-primary-500: 99 102 241;
+  --c-primary-600: 79 70 229;
+  --c-primary-700: 67 56 202;
+  --c-primary-800: 55 48 163;
+  --c-primary-900: 49 46 129;
+
+  --c-accent-400: 56 189 248;
+  --c-accent-500: 14 165 233;
+  --c-accent-600: 2 132 199;
+
+  /* Surfaces — light theme, very light cool grays */
+  --c-surface-0: 248 250 252;  /* page bg */
+  --c-surface-1: 255 255 255;  /* card */
+  --c-surface-2: 241 245 249;  /* nested */
+  --c-surface-3: 226 232 240;  /* hovered card */
+
+  --c-border-subtle: 226 232 240;
+  --c-border-default: 203 213 225;
+  --c-border-strong: 148 163 184;
+
+  --c-text-primary:   15 23 42;
+  --c-text-secondary: 51 65 85;
+  --c-text-tertiary:  100 116 139;
+  --c-text-muted:     148 163 184;
+  --c-text-inverse:   255 255 255;
+}
+
+/* Dark Tech — deep navy with cyan accent (Linear / Vercel vibe) */
+:root[data-theme='dark-tech'] {
+  --c-primary-50:  15 23 42;
+  --c-primary-100: 30 41 59;
+  --c-primary-200: 51 65 85;
+  --c-primary-300: 56 189 248;
+  --c-primary-400: 56 189 248;
+  --c-primary-500: 14 165 233;
+  --c-primary-600: 2 132 199;
+  --c-primary-700: 3 105 161;
+  --c-primary-800: 7 89 133;
+  --c-primary-900: 8 47 73;
+
+  --c-accent-400: 45 212 191;
+  --c-accent-500: 20 184 166;
+  --c-accent-600: 13 148 136;
+
+  --c-surface-0: 9 13 22;     /* near-black with blue tint */
+  --c-surface-1: 17 24 39;    /* card */
+  --c-surface-2: 24 33 51;    /* nested */
+  --c-surface-3: 33 44 66;    /* hovered */
+
+  --c-border-subtle: 30 41 59;
+  --c-border-default: 51 65 85;
+  --c-border-strong: 71 85 105;
+
+  --c-text-primary:   241 245 249;
+  --c-text-secondary: 203 213 225;
+  --c-text-tertiary:  148 163 184;
+  --c-text-muted:     100 116 139;
+  --c-text-inverse:   15 23 42;
+}
+
+/* Dark Neon — deep purple-black with magenta/violet glow */
+:root[data-theme='dark-neon'] {
+  --c-primary-50:  20 12 36;
+  --c-primary-100: 35 21 60;
+  --c-primary-200: 60 30 100;
+  --c-primary-300: 124 58 237;
+  --c-primary-400: 139 92 246;
+  --c-primary-500: 168 85 247;   /* violet 500 */
+  --c-primary-600: 147 51 234;
+  --c-primary-700: 126 34 206;
+  --c-primary-800: 107 33 168;
+  --c-primary-900: 76 29 149;
+
+  --c-accent-400: 244 114 182;   /* pink */
+  --c-accent-500: 236 72 153;
+  --c-accent-600: 219 39 119;
+
+  --c-surface-0: 13 7 26;
+  --c-surface-1: 22 14 42;
+  --c-surface-2: 33 22 60;
+  --c-surface-3: 47 31 84;
+
+  --c-border-subtle: 41 28 70;
+  --c-border-default: 60 40 100;
+  --c-border-strong: 88 60 140;
+
+  --c-text-primary:   245 243 255;
+  --c-text-secondary: 216 200 245;
+  --c-text-tertiary:  170 150 210;
+  --c-text-muted:     120 100 160;
+  --c-text-inverse:   20 12 36;
+}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart BI</title>
+    <script>
+      // Anti-flash: apply persisted theme before the first paint, so the
+      // user never sees a light-mode flash when their preference is dark.
+      (function () {
+        try {
+          var t = localStorage.getItem('smart-bi.theme');
+          if (t && t !== 'system' && t !== 'light') {
+            document.documentElement.dataset.theme = t;
+          } else if (t === 'system') {
+            document.documentElement.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark-tech'
+              : 'light';
+          } else if (!t) {
+            // No saved preference — follow OS
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              document.documentElement.dataset.theme = 'dark-tech';
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

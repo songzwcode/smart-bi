@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+.installed.cfg
+*.egg
+
+# Virtual env
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Env & secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+~/.smart-bi/logs/
+
+# User data
+.smart-bi/
+*.db
+*.sqlite
+*.sqlite3
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.local
+
+# PyInstaller
+packaging/build/
+packaging/dist/
+packaging/*.spec.bak
+
+# OS
+Thumbs.db
+*.app/

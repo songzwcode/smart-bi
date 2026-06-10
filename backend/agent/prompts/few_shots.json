@@ -1,0 +1,34 @@
+[
+  {
+    "question": "显示销售额最高的前 10 个客户",
+    "sql": "SELECT c.customer_id, c.customer_name, SUM(o.total_amount) AS total_sales\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nGROUP BY c.customer_id, c.customer_name\nORDER BY total_sales DESC\nLIMIT 10;"
+  },
+  {
+    "question": "统计每个区域的月度销售额",
+    "sql": "SELECT r.region_name, DATE_FORMAT(o.order_date, '%Y-%m') AS month, SUM(o.total_amount) AS monthly_sales\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nJOIN regions r ON c.region_id = r.region_id\nGROUP BY r.region_name, DATE_FORMAT(o.order_date, '%Y-%m')\nORDER BY month, r.region_name;"
+  },
+  {
+    "question": "最近 7 天每天的订单数",
+    "sql": "SELECT DATE(order_date) AS day, COUNT(*) AS order_count\nFROM orders\nWHERE order_date >= DATE('now', '-7 days')\nGROUP BY DATE(order_date)\nORDER BY day;"
+  },
+  {
+    "question": "查询所有产品的库存和价格",
+    "sql": "SELECT product_id, product_name, price, stock FROM products ORDER BY product_id;"
+  },
+  {
+    "question": "平均订单金额超过 500 元的客户",
+    "sql": "SELECT c.customer_id, c.customer_name, AVG(o.total_amount) AS avg_order\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nGROUP BY c.customer_id, c.customer_name\nHAVING AVG(o.total_amount) > 500\nORDER BY avg_order DESC;"
+  },
+  {
+    "question": "查询每个客户的总订单数和总金额",
+    "sql": "SELECT c.customer_id, c.customer_name, COUNT(o.order_id) AS order_count, SUM(o.total_amount) AS total_amount\nFROM customers c\nLEFT JOIN orders o ON c.customer_id = o.customer_id\nGROUP BY c.customer_id, c.customer_name\nORDER BY total_amount DESC;"
+  },
+  {
+    "question": "按品类统计销售额占比",
+    "sql": "SELECT p.category, SUM(oi.quantity * oi.unit_price) AS category_sales,\n       (SUM(oi.quantity * oi.unit_price) * 100.0 / (SELECT SUM(quantity * unit_price) FROM order_items)) AS pct\nFROM order_items oi\nJOIN products p ON oi.product_id = p.product_id\nGROUP BY p.category\nORDER BY category_sales DESC;"
+  },
+  {
+    "question": "查询从未下过订单的客户",
+    "sql": "SELECT c.customer_id, c.customer_name, c.email\nFROM customers c\nLEFT JOIN orders o ON c.customer_id = o.customer_id\nWHERE o.order_id IS NULL;"
+  }
+]

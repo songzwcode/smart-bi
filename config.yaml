@@ -1,0 +1,77 @@
+# Smart BI 默认配置
+# 实际值可通过环境变量或 .env 覆盖
+
+app:
+  name: "Smart BI"
+  version: "0.1.0"
+  debug: false
+  port_range: [17890, 17999]   # 后端 FastAPI 探测区间
+  host: "127.0.0.1"
+
+llm:
+  default_provider: "ollama"   # ollama | openai | anthropic | custom
+  # 想直接用 MiniMax：把上面改成 "custom"，并把 custom.default_model 设为 MiniMax-M3
+  # 并在 .env 配 CUSTOM_LLM_API_KEY=sk-cp-...（或在 Settings UI 输入）
+  providers:
+    ollama:
+      base_url: "http://localhost:11434"
+      default_model: "qwen2.5-coder:14b"
+      # 备选：qwen2.5-coder:7b, deepseek-coder-v2:16b, codellama:13b
+    openai:
+      base_url: "https://api.openai.com/v1"
+      default_model: "gpt-4o"
+      api_key_env: "OPENAI_API_KEY"
+    anthropic:
+      base_model: "claude-3-5-sonnet-20241022"
+      api_key_env: "ANTHROPIC_API_KEY"
+    # OpenAI-compatible HTTP endpoint. 适配 vLLM / llama.cpp server /
+    # LiteLLM / OpenRouter / OneAPI / 自建网关 / MiniMax 平台等。
+    # 推荐用 Settings UI 或环境变量 CUSTOM_LLM_URL / CUSTOM_LLM_API_KEY 配置；
+    # 不要把 key 写进文件。
+    custom:
+      # 国内默认指向 MiniMax 平台（api.minimaxi.com），海外可改为 api.minimax.io
+      base_url: "https://api.minimaxi.com/v1"
+      default_model: "MiniMax-M3"   # MiniMax-M3 / M2.7 / M2.5 / M2.1
+      api_key: ""                    # 留空，从环境变量读取
+      api_key_env: "CUSTOM_LLM_API_KEY"
+
+agent:
+  max_self_correct_rounds: 2
+  max_plan_steps: 6
+  enable_planner: true        # 简单查询走单步，复杂查询才拆解
+  enable_schema_rag: true
+  schema_rag_top_k: 5
+  enable_few_shot: true
+  few_shot_count: 5
+
+database:
+  default_url: "sqlite:///examples/sample.db"
+  # 默认安全策略：只允许 SELECT
+  readonly_by_default: true
+  dangerous_keywords:
+    - "DROP"
+    - "TRUNCATE"
+    - "ALTER"
+    - "GRANT"
+    - "REVOKE"
+    - "CREATE USER"
+  allowed_dml: ["SELECT"]  # 默认仅允许 SELECT，可手动改为 [SELECT, INSERT, UPDATE, DELETE]
+  query_timeout_seconds: 30
+  max_rows: 1000            # 返回前端的硬上限
+
+output:
+  chart_default_type: "bar"  # bar | line | pie | scatter | table
+  chart_theme: "plotly_white"
+  sql_dialect_default: "ansi"  # ansi | mysql | postgres
+
+paths:
+  static_dir: "backend/static"   # 前端构建产物
+  prompts_dir: "backend/agent/prompts"
+  data_dir: "~/.smart-bi"        # ChromaDB 持久化、缓存等
+  export_dir: "~/Documents/SmartBI"   # 用户导出文件目录
+
+logging:
+  level: "INFO"   # DEBUG | INFO | WARNING | ERROR
+  file: "~/.smart-bi/logs/app.log"
+  rotation: "10 MB"
+  retention: "7 days"
